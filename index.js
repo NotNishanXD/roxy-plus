@@ -92,6 +92,17 @@ client.on('ready', () => {
     const aiManager = require('./commands/aiManager');
     aiManager.initialize(client);
 
+    // Initialize Status Manager
+    const statusManager = require('./commands/statusManager');
+    // Note: rpcManager.initialize already handles setting the initial merged presence
+
+    // Heartbeat to prevent status from disappearing (every 10 minutes)
+    setInterval(async () => {
+        const rpcManager = require('./commands/rpcManager');
+        const data = rpcManager.loadData();
+        await rpcManager.setPresence(client, data);
+    }, 10 * 60 * 1000);
+
     // Initialize Mirror System
     const mirrorManager = require('./commands/mirrorManager');
     mirrorManager.initialize(client);

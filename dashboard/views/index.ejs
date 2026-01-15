@@ -88,7 +88,7 @@
 
         <hr class="divider">
 
-        <form action="/update-status" method="POST" class="settings-form">
+        <form id="statusForm" action="/update-status" method="POST" class="settings-form">
             <div class="form-group">
                 <label>Status Mode</label>
                 <div class="status-options">
@@ -124,7 +124,7 @@
                 <small class="hint">Paste emoji or use ID format for custom ones</small>
             </div>
 
-            <button type="submit" class="save-btn">Update Status</button>
+            <button type="submit" id="updateStatusBtn" class="save-btn">Update Status</button>
         </form>
 
     </div>
@@ -149,6 +149,50 @@
 
         setInterval(updateUptime, 1000);
         updateUptime(); // Initial call
+
+        // AJAX Status Update
+        document.getElementById('statusForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('updateStatusBtn');
+            const originalText = btn.innerText;
+
+            // Visual feedback - Loading? Optional, but let's go straight to success handling if fast.
+            // But let's disable to prevent double click
+            btn.disabled = true;
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch('/update-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    btn.style.transition = 'background-color 0.3s';
+                    btn.style.backgroundColor = '#43b581'; // Discord Green
+                    btn.innerText = 'Saved!';
+
+                    setTimeout(() => {
+                        btn.style.backgroundColor = ''; // Revert to CSS default
+                        btn.innerText = originalText;
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    alert('Failed to save status.');
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error saving status.');
+                btn.disabled = false;
+            }
+        });
     </script>
     <%- include('partials/super_button') %>
 </body>

@@ -143,25 +143,14 @@ module.exports = (client) => {
         // Calculate initial uptime in seconds
         const uptimeSeconds = Math.floor(client.uptime / 1000);
 
-        // Get status
-        let status = 'offline';
-        if (client.user.presence) {
-            status = client.user.presence.status;
-        } else {
-            status = 'online';
-        }
+        // Load persisted status data
+        const statusManager = require('../commands/statusManager');
+        const statusData = statusManager.loadData();
 
-        // Get current activity
-        let currentActivity = '';
-        let currentEmoji = '';
-
-        if (client.user.presence && client.user.presence.activities) {
-            const custom = client.user.presence.activities.find(a => a.type === 'CUSTOM' || a.id === 'custom');
-            if (custom) {
-                currentActivity = custom.state || '';
-                currentEmoji = custom.emoji ? (custom.emoji.id ? `<${custom.emoji.animated ? 'a' : ''}:${custom.emoji.name}:${custom.emoji.id}>` : custom.emoji.name) : '';
-            }
-        }
+        // Use persisted data, falling back to defaults if necessary
+        const status = statusData.status || 'online';
+        const currentActivity = statusData.custom_status || '';
+        const currentEmoji = statusData.emoji || '';
 
         res.render('index', {
             user: client.user,
@@ -187,6 +176,10 @@ module.exports = (client) => {
             // Trigger update via RPC Manager (which merges RPC + Status)
             const rpcManager = require('../commands/rpcManager');
             await rpcManager.setPresence(client, rpcManager.loadData());
+
+            if (req.xhr || req.headers.accept && req.headers.accept.indexOf('json') > -1) {
+                return res.json({ success: true, message: 'Status updated!' });
+            }
 
             res.redirect('/');
         } catch (error) {
