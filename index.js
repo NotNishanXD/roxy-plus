@@ -30,25 +30,13 @@ client.lavalink = lavalink;
 client.queueManager = queueManager;
 client.voiceStates = voiceStates;
 
-function loadAllowedUsers() {
-    try {
-        const allowedPath = path.join(__dirname, 'data', 'allowed.json');
-        if (!fs.existsSync(allowedPath)) {
-            const defaultData = { allowedUsers: [] };
-            fs.writeFileSync(allowedPath, JSON.stringify(defaultData, null, 2));
-            return defaultData.allowedUsers;
-        }
-        const data = JSON.parse(fs.readFileSync(allowedPath, 'utf8'));
-        return data.allowedUsers || [];
-    } catch (error) {
-        console.error('Error loading allowed users:', error);
-        return [];
-    }
-}
+// Allowed Users Logic
+const allowedManager = require('./commands/allowedManager');
 
 function isAllowedUser(userId) {
-    const allowedUsers = loadAllowedUsers();
-    return allowedUsers.includes(userId);
+    // Always allow the bot owner (the user logged in)
+    if (userId === client.user.id) return true;
+    return allowedManager.isAllowed(userId);
 }
 
 const commandsPath = path.join(__dirname, 'commands');

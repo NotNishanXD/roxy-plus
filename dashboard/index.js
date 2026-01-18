@@ -450,6 +450,39 @@ module.exports = (client) => {
     app.get('/commands/mirror', (req, res) => {
         res.render('cmd_mirror', { user: client.user, page: 'commands' });
     });
+    app.get('/commands/allowed', (req, res) => {
+        res.render('cmd_allowed', { user: client.user, page: 'commands' });
+    });
+
+    // --- Allowed ID Routes ---
+    app.get('/api/allowed', async (req, res) => {
+        const allowedManager = require('../commands/allowedManager');
+        const data = allowedManager.loadData();
+
+        // Enrich user data
+        const enrichedUsers = await Promise.all(data.allowedUsers.map(async (id) => {
+            const u = await client.users.fetch(id).catch(() => null);
+            return {
+                id,
+                username: u ? u.username : 'Unknown User',
+                avatar: u ? u.displayAvatarURL({ dynamic: true }) : 'https://cdn.discordapp.com/embed/avatars/0.png'
+            };
+        }));
+
+        res.json({ allowedUsers: enrichedUsers });
+    });
+
+    app.post('/api/allowed', (req, res) => {
+        const { action, id } = req.body;
+        const allowedManager = require('../commands/allowedManager');
+
+        if (action === 'add') {
+            allowedManager.addAllowedUser(id);
+        } else if (action === 'remove') {
+            allowedManager.removeAllowedUser(id);
+        }
+        res.json({ success: true });
+    });
 
     // --- Mirror Routes ---
     app.get('/api/mirror', (req, res) => {
