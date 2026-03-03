@@ -121,6 +121,9 @@ if (client.lavalink) {
         const guildId = packet.guild_id;
         if (!voiceStates[guildId]) voiceStates[guildId] = {};
         voiceStates[guildId].sessionId = packet.session_id;
+        if (packet.channel_id) {
+            voiceStates[guildId].channelId = packet.channel_id;
+        }
         console.log(`[Voice] State update for guild ${guildId}`);
     });
 
