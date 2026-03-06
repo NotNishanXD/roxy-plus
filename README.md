@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&duration=3000&pause=500&color=5f00ff&center=true&vCenter=true&width=440&lines=Welcome+to+Roxy+plus;advance+discord+selfbot;Deshboard+based+cmd;By+it's+Manish" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&duration=3000&pause=500&color=5f00ff&center=true&vCenter=true&width=440&lines=Welcome+to+Roxy+plus;advance+discord+selfbot;Deshboard+based+cmd;By+M4rkyyyyy" alt="Typing SVG" />
 </p>
 
 <p align="center">
